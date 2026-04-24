@@ -23,6 +23,13 @@
                 <form id="memo-form">
                     <input type="text" id="memo-title" placeholder="Memo title..." required autocomplete="off">
                     <textarea id="memo-content" placeholder="Write your thoughts here..." required></textarea>
+                    <div class="file-input-wrapper">
+                        <label for="memo-image" class="file-label">
+                            <i class="ph ph-image"></i> Add Image
+                        </label>
+                        <input type="file" id="memo-image" accept="image/*" class="hidden-input">
+                        <span id="memo-image-name" class="file-name"></span>
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="btn-primary">
                             <i class="ph ph-plus"></i> Add Memo
@@ -56,6 +63,13 @@
                 <input type="hidden" id="edit-id">
                 <input type="text" id="edit-title" required autocomplete="off">
                 <textarea id="edit-content" required></textarea>
+                <div class="file-input-wrapper">
+                    <label for="edit-image" class="file-label">
+                        <i class="ph ph-image"></i> Change Image
+                    </label>
+                    <input type="file" id="edit-image" accept="image/*" class="hidden-input">
+                    <span id="edit-image-name" class="file-name"></span>
+                </div>
                 <div class="form-actions">
                     <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">Save Changes</button>

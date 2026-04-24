@@ -2,6 +2,8 @@
 const memoForm = document.getElementById('memo-form');
 const memoTitleInput = document.getElementById('memo-title');
 const memoContentInput = document.getElementById('memo-content');
+const memoImageInput = document.getElementById('memo-image');
+const memoImageName = document.getElementById('memo-image-name');
 const memoGrid = document.getElementById('memo-grid');
 const searchInput = document.getElementById('search-input');
 
@@ -11,6 +13,8 @@ const editForm = document.getElementById('edit-form');
 const editIdInput = document.getElementById('edit-id');
 const editTitleInput = document.getElementById('edit-title');
 const editContentInput = document.getElementById('edit-content');
+const editImageInput = document.getElementById('edit-image');
+const editImageName = document.getElementById('edit-image-name');
 const closeModalBtn = document.getElementById('close-modal');
 const cancelEditBtn = document.getElementById('cancel-edit');
 
@@ -28,6 +32,9 @@ function setupEventListeners() {
     memoForm.addEventListener('submit', handleAddMemo);
     searchInput.addEventListener('input', handleSearch);
     
+    memoImageInput.addEventListener('change', handleFileSelect(memoImageName));
+    editImageInput.addEventListener('change', handleFileSelect(editImageName));
+    
     // Modal events
     editForm.addEventListener('submit', handleUpdateMemo);
     closeModalBtn.addEventListener('click', closeModal);
@@ -41,19 +48,52 @@ function setupEventListeners() {
     });
 }
 
+// Handle file selection text
+function handleFileSelect(nameElement) {
+    return function(e) {
+        if (e.target.files.length > 0) {
+            nameElement.textContent = e.target.files[0].name;
+        } else {
+            nameElement.textContent = '';
+        }
+    };
+}
+
+// Helper to read file as Data URL
+function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(e);
+        reader.readAsDataURL(file);
+    });
+}
+
 // Handle adding a new memo
-function handleAddMemo(e) {
+async function handleAddMemo(e) {
     e.preventDefault();
     
     const title = memoTitleInput.value.trim();
     const content = memoContentInput.value.trim();
+    const imageFile = memoImageInput.files[0];
     
     if (!title || !content) return;
+    
+    let imageBase64 = null;
+    if (imageFile) {
+        try {
+            imageBase64 = await readFileAsDataURL(imageFile);
+        } catch (error) {
+            console.error("Error reading image:", error);
+        }
+    }
     
     const newMemo = {
         id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
         title,
         content,
+        image: imageBase64,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
@@ -64,6 +104,7 @@ function handleAddMemo(e) {
     
     // Reset form
     memoForm.reset();
+    memoImageName.textContent = '';
     memoTitleInput.focus();
 }
 
@@ -85,6 +126,9 @@ function openEditModal(id) {
     editTitleInput.value = memo.title;
     editContentInput.value = memo.content;
     
+    editImageInput.value = '';
+    editImageName.textContent = memo.image ? '(Image exists)' : '';
+    
     editModal.classList.remove('hidden');
     editTitleInput.focus();
 }
@@ -93,17 +137,30 @@ function openEditModal(id) {
 function closeModal() {
     editModal.classList.add('hidden');
     editForm.reset();
+    editImageName.textContent = '';
 }
 
 // Handle updating a memo
-function handleUpdateMemo(e) {
+async function handleUpdateMemo(e) {
     e.preventDefault();
     
     const id = editIdInput.value;
     const title = editTitleInput.value.trim();
     const content = editContentInput.value.trim();
+    const imageFile = editImageInput.files[0];
     
     if (!title || !content) return;
+    
+    const existingMemo = memos.find(m => m.id === id);
+    let imageBase64 = existingMemo.image;
+    
+    if (imageFile) {
+        try {
+            imageBase64 = await readFileAsDataURL(imageFile);
+        } catch (error) {
+            console.error("Error reading image:", error);
+        }
+    }
     
     memos = memos.map(memo => {
         if (memo.id === id) {
@@ -111,6 +168,7 @@ function handleUpdateMemo(e) {
                 ...memo,
                 title,
                 content,
+                image: imageBase64,
                 updatedAt: new Date().toISOString()
             };
         }
@@ -170,6 +228,10 @@ function renderMemos(searchTerm = '') {
         const isEdited = memo.createdAt !== memo.updatedAt;
         const dateToShow = isEdited ? `Edited: ${formatDate(memo.updatedAt)}` : formatDate(memo.createdAt);
         
+        const imageHTML = memo.image 
+            ? `<div class="memo-image-container"><img src="${memo.image}" class="memo-image" alt="Memo Image"></div>` 
+            : '';
+        
         const card = document.createElement('article');
         card.className = 'memo-card';
         // Add staggered animation delay
@@ -187,6 +249,7 @@ function renderMemos(searchTerm = '') {
                     </button>
                 </div>
             </div>
+            ${imageHTML}
             <div class="memo-body">
                 <p>${escapeHTML(memo.content)}</p>
             </div>
