@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Memo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Phosphor Icons for modern SVG icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Chanung's Memo</h1>
+            <p class="subtitle">Capture your thoughts effortlessly.</p>
+        </header>
+
+        <main>
+            <section class="memo-input-section">
+                <form id="memo-form">
+                    <input type="text" id="memo-title" placeholder="Memo title..." required autocomplete="off">
+                    <textarea id="memo-content" placeholder="Write your thoughts here..." required></textarea>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="ph ph-plus"></i> Add Memo
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="memo-list-section">
+                <div class="filters">
+                    <div class="search-box">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search memos...">
+                    </div>
+                </div>
+                <div id="memo-grid" class="memo-grid">
+                    <!-- Memos will be rendered here via JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Memo</h2>
+                <button id="close-modal" class="btn-icon"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <input type="text" id="edit-title" required autocomplete="off">
+                <textarea id="edit-content" required></textarea>
+                <div class="form-actions">
+                    <button type="button" id="cancel-edit" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
